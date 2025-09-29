@@ -66,7 +66,6 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **opts):
-        # --- prerequisites ---
         if Faker is None:
             self.stdout.write(self.style.WARNING(
                 "Faker not installed. Installing it is recommended for nicer fake data:\n"
@@ -80,20 +79,16 @@ class Command(BaseCommand):
         total_comments = opts["comments"]
         total_likes = opts["likes"]
 
-        # --- destructive cleanup in safe order ---
         if fresh:
             self.stdout.write(self.style.WARNING("Wiping demo content (likes → comments → posts → tags → non-superusers)..."))
             PostUserLikes.objects.all().delete()
             Comment.objects.all().delete()
             Post.objects.all().delete()
             Tag.objects.all().delete()
-            # remove non-superusers to get a clean slate (keep superusers)
             for u in User.objects.filter(is_superuser=False):
-                # cascade will remove their UserProfile via FK if defined as such; but
-                # we ensure profiles later anyway
                 u.delete()
 
-        # --- base 4 users (idempotent) ---
+        # --- base 4 users ---
         self.stdout.write("Ensuring base users exist (admin/demo/alice/bob)...")
         base_specs = [
             {"username": "admin", "email": "admin@example.com", "is_superuser": True,  "is_staff": True},
@@ -115,15 +110,13 @@ class Command(BaseCommand):
                 user.set_password("StrongPass123!")
                 user.save()
             users.append(user)
-
-        # --- add extra users up to --users ---
+            
         current_total = User.objects.count()
         if current_total < total_users:
             extra_needed = total_users - current_total
             self.stdout.write(f"Creating {extra_needed} extra users...")
             for i in range(extra_needed):
                 uname = (fake.user_name() if fake else f"user{i+1}")  # best effort unique
-                # ensure uniqueness if Faker collides
                 base_uname = uname
                 suffix = 1
                 while User.objects.filter(username=uname).exists():
@@ -137,22 +130,18 @@ class Command(BaseCommand):
                 )
                 users.append(u)
         else:
-            # refresh list to include any existing users beyond base 4
             users = list(User.objects.all())
-
-        # --- ensure a profile for every user ---
+            
         self.stdout.write("Ensuring profiles exist for all users...")
         for u in users:
             UserProfile.objects.get_or_create(user=u)
 
-        # --- tags (idempotent) ---
         self.stdout.write("Creating tags (idempotent)...")
         tag_objs = []
         for name in TAGS:
             tag, _ = Tag.objects.get_or_create(name=name)
             tag_objs.append(tag)
 
-        # --- authors = all non-superusers ---
         authors = [u for u in users if not u.is_superuser]
         if not authors:
             self.stdout.write(self.style.WARNING("No non-admin authors found; posts/comments/likes will be skipped."))
@@ -160,11 +149,9 @@ class Command(BaseCommand):
         else:
             authors_profiles = [u.userprofile for u in authors]
 
-        # --- posts ---
         post_objs = []
 
         if total_posts is None:
-            # default: ~3 posts per author
             default_ppu = 3
             self.stdout.write(f"Creating ~{default_ppu} posts per non-admin user (total ~{len(authors_profiles)*default_ppu})...")
             for prof in authors_profiles:
@@ -200,7 +187,6 @@ class Command(BaseCommand):
                 post.tags.set(random.sample(tag_objs, k=random.randint(0, min(3, len(tag_objs)))))
                 post_objs.append(post)
 
-        # --- comments ---
         if post_objs and authors_profiles:
             if total_comments is None:
                 self.stdout.write("Creating 0–2 comments per post...")
@@ -229,7 +215,6 @@ class Command(BaseCommand):
                         text=(f"Comment #{i+1}" if not fake else fake.sentence()),
                     )
 
-        # --- likes ---
         if post_objs and authors_profiles:
             if total_likes is None:
                 self.stdout.write("Creating 0–N likes per post...")
@@ -245,7 +230,6 @@ class Command(BaseCommand):
                     lp = random.choice(authors_profiles)
                     PostUserLikes.objects.get_or_create(post=post, user=lp)
 
-        # --- summary ---
         out = {
             "users": User.objects.count(),
             "profiles": UserProfile.objects.count(),
