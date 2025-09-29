@@ -1,4 +1,3 @@
-// src/pages/EditPost.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import {
@@ -29,13 +28,11 @@ export default function EditPost() {
 
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
-  // TagSelector expects array of names/ids (we'll use names for free-text create)
   const [tagInputs, setTagInputs] = useState([]);
 
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState(null);
 
-  // Load existing post
   useEffect(() => {
     let alive = true;
     setLoading(true);
@@ -44,7 +41,6 @@ export default function EditPost() {
         if (!alive) return;
         setTitle(data.title || "");
         setText(data.text || "");
-        // Prefer names so backend can create if new; fallback to ids if missing
         const names = (data.tags || [])
           .map((t) => t?.name?.trim())
           .filter(Boolean);
@@ -62,10 +58,8 @@ export default function EditPost() {
     };
   }, [id]);
 
-  // Guard: wait for auth resolution
   if (authLoading) return null;
 
-  // Hard guard: only admins can access
   if (!isAdmin) {
     return (
       <Container maxWidth="sm" sx={{ py: 6 }}>
@@ -112,7 +106,7 @@ export default function EditPost() {
       const patch = {
         title,
         text,
-        tag_inputs: tagInputs, // names or ids
+        tag_inputs: tagInputs,
       };
       const updated = await updatePost(Number(id), patch);
       toast.success("Post updated ✅");

@@ -9,8 +9,6 @@ import {
   Button,
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
-
-// MUI icons
 import SecurityIcon from "@mui/icons-material/Security";
 import ApiIcon from "@mui/icons-material/Api";
 import StorageIcon from "@mui/icons-material/Storage";
@@ -20,7 +18,6 @@ import CodeIcon from "@mui/icons-material/Code";
 import WebAssetIcon from "@mui/icons-material/WebAsset";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-// Custom SVG icons
 function PythonIcon(props) {
   return (
     <svg

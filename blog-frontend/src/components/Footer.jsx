@@ -1,4 +1,3 @@
-// src/components/Footer.jsx
 import React from "react";
 import {
   Box,
@@ -47,7 +46,6 @@ const Footer = () => {
           justifyContent="space-between"
           spacing={2}
         >
-          {/* Left: brand / copy */}
           <Stack spacing={0.5}>
             <Typography variant="body2" color="text.secondary">
               © {new Date().getFullYear()} Moshe Green's Blog Project
@@ -57,7 +55,6 @@ const Footer = () => {
             </Typography>
           </Stack>
 
-          {/* Right: actions */}
           <Stack
             direction="row"
             spacing={1}

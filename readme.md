@@ -1,143 +1,197 @@
 # 📝 Django + React Blog App
 
-A modern **full-stack blog demo** built with **Django REST Framework** (backend) and **React + Vite + Material UI** (frontend).  
-Supports JWT authentication, role-based permissions, post CRUD with category tags, likes, comments, and filtering.
+_A modern **full-stack blog demo** built with Django REST Framework (backend) and React + Vite + Material UI (frontend)._
 
 ---
 
-## 🚀 Features
+## ⚡ Quickstart (Demo Mode)
 
-### Backend (Django + DRF)
+```bash
+# 1. Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate   # (Linux/macOS)
+.venv\Scripts\activate      # (Windows)
 
-- Django REST Framework API
-- JWT authentication with [SimpleJWT](https://django-rest-framework-simplejwt.readthedocs.io/)
-- Role-based permissions:
-  - **Admins** can create/update/delete posts, delete comments, manage users
-  - **Users** can register/login, like/unlike posts, comment
-  - Everyone can browse posts
-- Tags system (case-insensitive, auto-create on demand)
-- Post likes with `likes_count`, `liked_by_me`, and (for admins/authors) list of likers
-- Comment replies and ownership checks
-- Pagination, filtering, search, ordering
-- CORS ready
+# 2. Install backend dependencies
+pip install -r requirements.txt
 
-### Frontend (React + Vite + MUI)
+# 3. Run migrations + seed demo data
+export DEMO_PASSWORD='Abc!12345'
+export DEMO_DATA=1
+python manage.py migrate
+python manage.py seed_demo --fresh -y --seed 42
 
-- React 18 + Vite dev server
-- Material UI with light/dark mode toggle
-- Authentication flow (login/register/logout) with token storage and auto-refresh
-- Protected routes (only admins can access “New Post” and “My Posts”)
-- CRUD UI for posts
-- Rich filtering:
-  - Search posts by text, author, or tag (`#tag` support)
-  - Sort by date, title, or likes
-- Like/unlike posts with live counters
-- Add/delete comments
-- Toast notifications via [notistack](https://iamhosseindhv.com/notistack)
+# 4. Start backend
+python manage.py runserver   # http://localhost:8000/api/
 
----
+# 5. Frontend setup (in another terminal)
+cd blog-frontend
+npm install
+echo "VITE_API_URL=http://localhost:8000" > .env
+npm run dev   # http://localhost:5173
+✅ Logins available immediately:
 
-## 📂 Project Structure
+admin / Abc!12345
 
-project-root/
-├── backend/ (Django project)
-│ ├── api/ # Django app with models, views, serializers, permissions
-│ ├── finalproject/ # Django project settings
-│ ├── manage.py
-│ └── requirements.txt
-└── frontend/ (React + Vite app)
-├── src/
-│ ├── api/ # Axios clients for posts, tags, comments, auth
-│ ├── components/ # Shared UI components
-│ ├── context/ # Auth context provider
-│ ├── pages/ # Page components (Home, PostDetail, NewPost, etc.)
-│ └── App.jsx
-├── index.html
-├── package.json
-└── vite.config.js
+demo / Abc!12345
 
----
+alice / Abc!12345
 
-## ⚙️ Setup
+bob / Abc!12345
 
-### 1. Backend (Django)
+🚀 Features
+Backend (Django + DRF)
+Django REST Framework API
 
-1. Create and activate a virtual environment:
+JWT authentication with SimpleJWT
 
-   ```bash
-   cd backend
-   python -m venv .venv
-   source .venv/bin/activate   # Linux/macOS
-   .venv\Scripts\activate      # Windows
+Role-based permissions:
 
-   ```
+Admins can create/update/delete posts, delete comments, manage users
 
-2. Install dependencies:
-   pip install -r requirements.txt
+Users can register/login, like/unlike posts, comment
 
-3. Run migrations and create a superuser:
-   python manage.py migrate
-   python manage.py createsuperuser
+Everyone can browse posts
 
-4. Start the dev server:
-   python manage.py runserver
-   API runs at: http://localhost:8000/api/
+Tags system (case-insensitive, auto-create on demand)
 
-5. Frontend (React + Vite)
+Post likes with likes_count, liked_by_me, and (for admins/authors) list of likers
 
-   1. Install dependencies:
-      cd frontend
-      npm install
+Comment replies and ownership checks
 
-   2. Create a .env file:
-      VITE_API_URL=http://localhost:8000
+Pagination, filtering, search, ordering
 
-   3. Start the dev server:
-      npm run dev
-      App runs at: http://localhost:5173
+CORS ready
 
-🔑 Authentication
+Frontend (React + Vite + MUI)
+React 18 + Vite dev server
 
-Register: /api/auth/register/
+Material UI with light/dark mode toggle
 
-Login: /api/auth/login/ → returns { access, refresh }
+Authentication flow (login/register/logout) with token storage and auto-refresh
 
-Refresh: /api/token/refresh/
+Protected routes (only admins can access “New Post” and “My Posts”)
 
-Current user: /api/me/
+CRUD UI for posts
 
-Frontend stores tokens in localStorage and auto-refreshes access when expired.
+Rich filtering:
 
-📡 API Highlights
+Search posts by text, author, or tag (#tag support)
 
-GET /posts/ → list posts (supports search, tag, ordering, pagination)
+Sort by date, title, or likes
 
-GET /posts/{id}/ → post detail (includes likes_count, liked_by_me)
+Like/unlike posts with live counters
 
-POST /posts/ → create post (admin only, requires tag_inputs)
+Add/delete comments
 
-PATCH /posts/{id}/ → edit post (admin only)
+Toast notifications via notistack
 
-DELETE /posts/{id}/ → delete post (admin only)
+📂 Project Structure
+text
+Copy code
+python-final-proj/
+├── api/                # Django app with models, views, serializers, permissions
+├── finalproject/       # Django project settings
+├── blog-frontend/      # React + Vite frontend
+│   ├── src/
+│   │   ├── api/        # Axios clients for posts, tags, comments, auth
+│   │   ├── components/ # Shared UI components
+│   │   ├── context/    # Auth context provider
+│   │   ├── pages/      # Page components (Home, PostDetail, NewPost, etc.)
+│   │   └── App.jsx
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+├── manage.py
+├── requirements.txt
+└── .env
+⚙️ Setup (Detailed)
+Backend (Django)
+Create and activate a virtual environment:
 
-POST /comments/ → add comment
+bash
+Copy code
+python -m venv .venv
+source .venv/bin/activate   # Linux/macOS
+.venv\Scripts\activate      # Windows
+Install dependencies:
 
-DELETE /comments/{id}/ → delete comment (admin or owner)
+bash
+Copy code
+pip install -r requirements.txt
+Apply migrations:
 
-POST /post-user-likes/ → like post
+bash
+Copy code
+python manage.py migrate
+(Optional) Create a personal superuser:
 
-DELETE /post-user-likes/{post_id}/by-post/ → unlike
+bash
+Copy code
+python manage.py createsuperuser
+Start the dev server:
 
-GET /posts/mine/ → list my posts (admin only)
+bash
+Copy code
+python manage.py runserver
+API runs at: http://localhost:8000/api/
 
-🛠️ Tech Stack
+Frontend (React + Vite)
+Install dependencies:
 
-Backend: Python, Django, Django REST Framework, SimpleJWT, PostgreSQL (or SQLite for dev)
+bash
+Copy code
+cd blog-frontend
+npm install
+Create a .env file:
 
-Frontend: React, Vite, Material UI, Axios, notistack
+bash
+Copy code
+echo "VITE_API_URL=http://localhost:8000" > .env
+Start the dev server:
 
-Other: Docker-ready (optional), CORS middleware
+bash
+Copy code
+npm run dev
+App runs at: http://localhost:5173
 
-📜 License
+📊 Demo Data
+The project includes a seeding command to auto-create demo users, posts, tags, comments, and likes.
 
-MIT License — free to use, modify, and distribute.
+Option A – Set your own password (recommended):
+
+bash
+Copy code
+export DEMO_PASSWORD='Abc!12345'
+export DEMO_DATA=1
+python manage.py seed_demo --fresh -y --seed 42
+Option B – Let the tool generate one:
+
+bash
+Copy code
+export DEMO_DATA=1
+python manage.py seed_demo --fresh -y --seed 42
+A strong random password will be generated and saved to .demo_credentials.txt.
+
+Demo Accounts (if Option A used):
+
+admin / Abc!12345
+
+demo / Abc!12345
+
+alice / Abc!12345
+
+bob / Abc!12345
+
+🔒 Production Notes
+Do not use the demo seeder in production databases.
+
+Always set DEBUG=False in .env for production.
+
+Use a secure, unique SECRET_KEY.
+
+Configure ALLOWED_HOSTS and a production database (e.g. PostgreSQL).
+
+Seed demo data only with DEMO_DATA=1 (or --allow-prod) in controlled environments.
+
+```

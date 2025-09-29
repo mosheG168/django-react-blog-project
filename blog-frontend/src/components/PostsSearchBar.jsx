@@ -23,7 +23,7 @@ export default function PostsSearchBar() {
     (query) => {
       const m = query.match(/#([\w-]+)/);
       const params = new URLSearchParams(sp);
-      params.delete("page"); // reset pagination on new search
+      params.delete("page");
 
       if (m) {
         params.set("tag", m[1]);

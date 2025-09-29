@@ -79,8 +79,7 @@ class Post(models.Model):
         unique=True,
         db_index=True,
         validators=[
-            MinLengthValidator(5),
-            RegexValidator(r'^[\w\s]+$', 'Title must be alphanumeric.')
+            MinLengthValidator(2),
         ]
     )
     text = models.TextField(validators=[MinLengthValidator(5)])

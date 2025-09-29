@@ -3,13 +3,13 @@ import { TextField, Chip, CircularProgress, Autocomplete } from "@mui/material";
 import { suggestTags } from "../api/tags";
 
 export default function TagSelector({
-  value, // string[]  (IDs as strings or names)
-  onChange, // (next: string[]) => void
+  value,
+  onChange,
   error,
   helperText,
   label = "Categories (min 1)",
 }) {
-  const [options, setOptions] = React.useState([]); // [{id,name,count}]
+  const [options, setOptions] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
 
@@ -40,7 +40,6 @@ export default function TagSelector({
     });
   }, [value, options]);
 
-  // Add a raw string into the selection with CI uniqueness
   const addFreeText = React.useCallback(
     (raw) => {
       const s = String(raw || "").trim();
@@ -66,14 +65,12 @@ export default function TagSelector({
       inputValue={inputValue}
       getOptionLabel={(opt) => (typeof opt === "string" ? opt : opt.name)}
       onInputChange={(_, q, reason) => {
-        // ✅ Only update when user is typing; ignore 'reset'/'clear' that would blank the input
         if (reason === "input") {
           setInputValue(q);
           debouncedFetch(q);
         }
       }}
       onChange={(_, newValue) => {
-        // Prefer names so backend can create if needed
         const next = newValue
           .map((v) =>
             typeof v === "string" ? v.trim() : String(v.name || "").trim()
@@ -91,7 +88,6 @@ export default function TagSelector({
         }
         onChange(unique);
       }}
-      // Auto-commit whatever the user has typed when leaving the field
       onBlur={() => {
         if (inputValue.trim()) {
           addFreeText(inputValue);
