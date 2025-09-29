@@ -1,4 +1,5 @@
-# api/management/commands/seed_demo.py
+# I wrote this file as a Django command to load demo data for dev and testing. It’s safe to run multiple times, has a --fresh option to reset, and prints out demo credentials at the end.
+
 from __future__ import annotations
 
 import os
@@ -40,7 +41,7 @@ LOREM: str = (
 TAGS: List[str] = ["general", "django", "drf", "postgres", "tips", "how-to"]
 
 
-# ----------------- small schema helpers (no assumptions) -----------------
+# ----------------- schema helpers -----------------
 def has_field(model, name: str) -> bool:
     for f in model._meta.get_fields():
         if f.name == name and not f.many_to_many and not f.one_to_many:
@@ -111,7 +112,7 @@ class Command(BaseCommand):
         else:
             fake = Faker()
 
-        # ---------- args ----------
+        # ---------- arguments ----------
         total_users = max(4, int(opts["users"]))
         total_posts: Optional[int] = opts["posts"]
         total_comments: Optional[int] = opts["comments"]
@@ -189,7 +190,7 @@ class Command(BaseCommand):
                 u = User.objects.create_user(
                     username=uname,
                     email=email,
-                    password=demo_password,  # create_user will hash
+                    password=demo_password,  
                 )
                 users.append(u)
         else:
@@ -207,7 +208,7 @@ class Command(BaseCommand):
             tag, _ = Tag.objects.get_or_create(name=name)
             tag_objs.append(tag)
 
-        # ---------- authors/profiles (no reverse attr assumptions) ----------
+        # ---------- authors/profiles ----------
         authors = User.objects.filter(is_superuser=False)
         authors_profiles = list(UserProfile.objects.select_related("user").filter(user__in=authors))
 
@@ -216,7 +217,6 @@ class Command(BaseCommand):
         if authors_profiles:
             def make_post_defaults(prof: UserProfile):
                 defaults = {}
-                # only set fields that actually exist
                 if has_field(Post, "text"):
                     defaults["text"] = LOREM if not fake else fake.paragraph(nb_sentences=5)
                 if has_field(Post, "status"):
@@ -225,7 +225,6 @@ class Command(BaseCommand):
                     defaults["author"] = prof
                 if has_field(Post, "created_at"):
                     f = get_field(Post, "created_at")
-                    # set only if editable or no auto_now_add
                     try:
                         if getattr(f, "editable", True) and not getattr(f, "auto_now_add", False):
                             defaults["created_at"] = timezone.now()
@@ -316,7 +315,6 @@ class Command(BaseCommand):
         }
         self.stdout.write(self.style.SUCCESS(f"Seeded ✅  {out}"))
 
-        # ---------- credentials note (no plaintext in stdout) ----------
         try:
             if generated:
                 creds = [
