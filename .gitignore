@@ -1,0 +1,8 @@
+# ---- Python / Django ----
+.venv/
+
+# ---- Node / React (frontend) ----
+blog-frontend/node_modules/
+
+
+
