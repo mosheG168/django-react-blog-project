@@ -101,7 +101,7 @@ export default function Navbar({ toggleMode, mode }) {
                 startIcon={<LogoutIcon />}
                 onClick={() => {
                   logout();
-                  navigate("/", { replace: true });
+                  navigate("/login", { replace: true });
                 }}
               >
                 Logout
