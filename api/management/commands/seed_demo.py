@@ -21,7 +21,7 @@ from api.models import UserProfile, Tag, Post, Comment, PostUserLikes
 try:
     from faker import Faker
 except ImportError:
-    Faker = None  # type: ignore
+    Faker = None  
 
 User = get_user_model()
 
