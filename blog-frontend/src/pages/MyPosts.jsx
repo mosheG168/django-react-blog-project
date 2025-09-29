@@ -27,11 +27,9 @@ export default function MyPosts() {
   useEffect(() => {
     let alive = true;
 
-    // Wait for auth to resolve first
     if (authLoading) return;
 
     if (!isAuthed) {
-      // Not authenticated → show message (or redirect if you prefer)
       setLoading(false);
       setItems([]);
       setErr({ message: "Please log in to view your posts." });

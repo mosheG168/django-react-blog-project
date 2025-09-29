@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import { useEffect, useRef, useState, useMemo } from "react";
 import { listPosts } from "../api/posts";
 import { suggestTags } from "../api/tags";
@@ -39,15 +38,11 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [ordering, setOrdering] = useState("-created_at");
   const [page, setPage] = useState(1);
-
-  // NEW: tag filter state (by tag NAME, not id — matches backend ?tag=)
-  const [tag, setTag] = useState(""); // empty = no filter
-  const [tagOptions, setTagOptions] = useState([]); // [{id,name,count}]
+  const [tag, setTag] = useState("");
+  const [tagOptions, setTagOptions] = useState([]);
   const [tagLoading, setTagLoading] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [resp, setResp] = useState({ count: 0, results: [] });
-
   const toast = useToast();
   const toastRef = useRef(toast);
   useEffect(() => {
@@ -56,7 +51,6 @@ export default function Home() {
 
   const debouncedSearch = useDebounced(search, 350);
 
-  // Detect #tag in the search box and prioritize it for filtering
   const effective = useMemo(() => {
     const m = debouncedSearch.match(/#([\w-]+)/);
     return {
@@ -65,7 +59,6 @@ export default function Home() {
     };
   }, [debouncedSearch, tag]);
 
-  // fetch posts
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -111,7 +104,6 @@ export default function Home() {
 
   const totalPages = Math.max(1, Math.ceil((resp.count || 0) / PAGE_SIZE));
 
-  // ------- tag suggest (debounced) -------
   const handleTagSuggest = useMemo(() => {
     let t;
     return (q) => {
@@ -128,7 +120,6 @@ export default function Home() {
     };
   }, []);
 
-  // Preload top tags once (so dropdown isn't empty before typing)
   useEffect(() => {
     (async () => {
       try {
@@ -148,7 +139,6 @@ export default function Home() {
     setPage(1);
   };
 
-  // remove a '#tag' token from the search input if present
   const clearHashtagFromSearch = () => {
     const next = (search || "")
       .replace(/(^|\s)#([\w-]+)\b/g, " ")
@@ -164,7 +154,6 @@ export default function Home() {
       </Typography>
 
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 3 }}>
-        {/* Search (understands #tag tokens too) */}
         <TextField
           fullWidth
           label="Search (try text or #tag)"
@@ -175,8 +164,6 @@ export default function Home() {
             setSearch(e.target.value);
           }}
         />
-
-        {/* Tag filter (optional, by name) */}
         <Autocomplete
           freeSolo
           size="small"
@@ -237,8 +224,6 @@ export default function Home() {
           Reset
         </Button>
       </Stack>
-
-      {/* Active filters summary */}
       <Stack direction="row" spacing={1} sx={{ mb: 1 }} flexWrap="wrap">
         {effective.tag && (
           <Chip
@@ -311,8 +296,6 @@ export default function Home() {
                       {(p.text ?? "").slice(0, 160)}
                       {(p.text ?? "").length > 160 ? "…" : ""}
                     </Typography>
-
-                    {/* Show tags on the card */}
                     <Stack
                       direction="row"
                       spacing={0.5}

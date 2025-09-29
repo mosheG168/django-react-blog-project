@@ -1,4 +1,3 @@
-# ---------- imports ----------
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
@@ -9,7 +8,6 @@ from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.decorators import action
 from django.db.models import Count
 from django.contrib.auth.models import User
-
 from api.models import Tag, Post, PostUserLikes, UserProfile, Comment
 from api.permissions import (
     IsAdmin, PostUserLikesPermission,
@@ -23,7 +21,6 @@ from api.serializers import (
 from api.throttles import MyRateThrottle
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from api.auth import get_jwt
-
 
 # ---------- Auth ----------
 class AuthViewSet(ViewSet):
@@ -55,7 +52,6 @@ class AuthViewSet(ViewSet):
             {"message": "User registered successfully", **jwt, "user": serializer.data},
             status=status.HTTP_201_CREATED
         )
-
 
 # ---------- Tags ----------
 class TagViewSet(ModelViewSet):
@@ -169,11 +165,6 @@ class PostUserLikesViewSet(ModelViewSet):
         return base
 
     def create(self, request, *args, **kwargs):
-        """
-        Idempotent like:
-        - POST {"post": <id>} → 201 Created on first like
-        - POST again for same post/user → 200 OK
-        """
         post_id = request.data.get("post")
         if not post_id:
             return Response({"post": ["This field is required."]},

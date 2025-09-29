@@ -1,4 +1,3 @@
-# api/auth.py
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,10 +7,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 def get_jwt(user):
-    """
-    Helper: mint JWTs for a given user.
-    Returns dict: {"access": "...", "refresh": "..."}
-    """
     refresh = RefreshToken.for_user(user)
     return {
         "access": str(refresh.access_token),
@@ -36,7 +31,6 @@ class RegisterView(APIView):
         try:
             validate_password(password)
         except Exception as e:
-            # ValidationError -> list of messages
             return Response({"detail": list(e)}, status=400)
 
         user = User.objects.create_user(username=username, email=email, password=password)

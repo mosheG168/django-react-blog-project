@@ -1,4 +1,3 @@
-// src/pages/PostDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useToast from "../hooks/useToast";
@@ -28,20 +27,14 @@ export default function PostDetail() {
   const navigate = useNavigate();
   const toast = useToast();
   const { user, isAdmin } = useAuth();
-
   const [post, setPost] = useState(null);
   const [loadingPost, setLoadingPost] = useState(true);
-
-  const [comments, setComments] = useState([]); // always an array
+  const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(true);
-
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
-
-  // filled icon when true
   const [liked, setLiked] = useState(false);
 
-  // Load post (and initialize liked from server)
   useEffect(() => {
     let alive = true;
     setLoadingPost(true);
@@ -61,7 +54,6 @@ export default function PostDetail() {
     };
   }, [id, toast]);
 
-  // Load comments for this post
   useEffect(() => {
     const ac = new AbortController();
     setLoadingComments(true);
@@ -112,7 +104,6 @@ export default function PostDetail() {
     }
   };
 
-  // Admin: delete post
   const onDeletePost = async () => {
     if (!post) return;
     if (!window.confirm("Delete this post? This cannot be undone.")) return;
@@ -129,7 +120,6 @@ export default function PostDetail() {
     }
   };
 
-  // Toggle like/unlike with filled/outline icon and snackbars
   const onToggleLike = async () => {
     if (!post || !user) return;
     setBusy(true);
@@ -156,7 +146,6 @@ export default function PostDetail() {
     }
   };
 
-  // Skeleton while loading post
   if (loadingPost) {
     return (
       <Container sx={{ py: 3 }}>
@@ -269,7 +258,6 @@ export default function PostDetail() {
 
         <Typography variant="h6">Comments</Typography>
 
-        {/* Comment form */}
         {user ? (
           <Box component="form" onSubmit={onComment} sx={{ mt: 1, mb: 2 }}>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
@@ -291,7 +279,6 @@ export default function PostDetail() {
           </Alert>
         )}
 
-        {/* Comments list */}
         {loadingComments ? (
           <Stack spacing={1}>
             {Array.from({ length: 3 }).map((_, i) => (

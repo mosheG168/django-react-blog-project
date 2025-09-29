@@ -1,4 +1,3 @@
-// src/main.jsx
 import React, { useMemo, useState } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
@@ -16,11 +15,9 @@ function ThemedApp() {
         palette: {
           mode,
           primary: {
-            // amber
             main: mode === "light" ? "#FFB300" : "#FFC107",
           },
           secondary: {
-            // gray
             main: mode === "light" ? "#424242" : "#BDBDBD",
           },
           background: {

@@ -1,4 +1,3 @@
-// src/pages/NewPost.jsx
 import { useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import api from "../api/client";
@@ -18,23 +17,19 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 
 export default function NewPost() {
-  const { loading, isAdmin } = useAuth(); // ← added
+  const { loading, isAdmin } = useAuth();
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
-  const [tagInputs, setTagInputs] = useState([]); // array of tag IDs or names
+  const [tagInputs, setTagInputs] = useState([]);
   const [saving, setSaving] = useState(false);
-
-  // field-level errors coming from DRF (e.g., { title: ["..."], tag_inputs: ["..."] })
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState(null);
 
   const toast = useToast();
   const nav = useNavigate();
 
-  // If auth is still resolving, render nothing (keeps UX smooth)
   if (loading) return null;
 
-  // Hard guard: only admins can access this page
   if (!isAdmin) {
     return (
       <Container maxWidth="sm" sx={{ py: 6 }}>
@@ -61,7 +56,6 @@ export default function NewPost() {
     const tTitle = title.trim();
     const tText = text.trim();
 
-    // basic client-side checks (match backend MinLengthValidator(5))
     const fe = {};
     if (!tTitle) fe.title = ["Title is required."];
     else if (tTitle.length < 5)
@@ -77,7 +71,6 @@ export default function NewPost() {
 
     if (Object.keys(fe).length) {
       setFieldErrors(fe);
-      // show a concise toast too
       toast.warning("Please fix the highlighted fields.");
       return;
     }
@@ -87,7 +80,7 @@ export default function NewPost() {
       const { data: created } = await api.post("/posts/", {
         title: tTitle,
         text: tText,
-        tag_inputs: tagInputs, // ✅ required by your backend
+        tag_inputs: tagInputs,
       });
 
       toast.success("Post created ✅");
@@ -95,17 +88,14 @@ export default function NewPost() {
     } catch (err) {
       const res = err?.response?.data;
 
-      // Handle unauthorized nicely
       if (err?.response?.status === 401) {
         toast.error("Your session expired. Please log in again.");
         nav("/login");
         return;
       }
 
-      // top-level error message (e.g., detail)
       setFormError(res?.detail || err?.message || "Could not create the post.");
 
-      // collect field errors from DRF response
       const fe2 = {};
       if (res && typeof res === "object") {
         Object.keys(res).forEach((k) => {
@@ -114,7 +104,6 @@ export default function NewPost() {
       }
       setFieldErrors(fe2);
 
-      // toast a concise message as well
       toast.error(res?.detail || "Could not create the post.");
     } finally {
       setSaving(false);

@@ -14,7 +14,7 @@ import {
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 export default function Register() {
-  const { register } = useAuth(); // Option A: backed by /api/auth/register/
+  const { register } = useAuth();
   const nav = useNavigate();
   const toast = useToast();
 
@@ -34,19 +34,14 @@ export default function Register() {
       password: form.password,
     };
 
-    // client-side guardrails
     const fe = {};
     if (!payload.username) fe.username = ["Username is required."];
     if (!payload.email) fe.email = ["Email is required."];
     if (!payload.password) fe.password = ["Password is required."];
-
-    // lightweight email check
     if (payload.email && !/\S+@\S+\.\S+/.test(payload.email)) {
       fe.email = ["Please enter a valid email address."];
     }
 
-    // password policy hint (mirrors backend)
-    // ≥8 chars, at least one lowercase, one uppercase, one digit, one special
     if (
       payload.password &&
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/.test(
@@ -65,11 +60,10 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await register(payload); // should create user + profile and return JWT
+      await register(payload);
       toast.success("Account created. Welcome! 🎉");
       nav("/");
     } catch (err) {
-      // Surface server messages and field errors if present
       const res = err?.response?.data;
       const msg =
         res?.detail ||

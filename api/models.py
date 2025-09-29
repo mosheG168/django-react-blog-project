@@ -4,11 +4,11 @@ from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 
 
-# ---- Roles ----------------------------------------------------
+# ---- Roles ----
 
 ROLE_CHOICES = (
     ("user", "User"),
-    ("manager", "Manager"),  # מנהל
+    ("manager", "Manager"),  
 )
 
 
@@ -20,7 +20,6 @@ class UserProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # computed property:
     @property
     def username(self):
         return self.user.username
@@ -35,10 +34,9 @@ class UserProfile(models.Model):
         ordering = ["-created_at"]
 
 
-# ---- Tags -----------------------------------------------------
+# ---- Tags -----
 
 class Tag(models.Model):
-    # DB-level CI uniqueness via expression constraint
     name = models.CharField(max_length=40, unique=False, db_index=True)
 
     class Meta:
@@ -59,7 +57,7 @@ class Tag(models.Model):
         return f'{self.name}'
 
 
-# ---- Posts ----------------------------------------------------
+# ---- Posts -----
 
 STATUS_CHOICES = (
     ('draft', 'Draft'),
@@ -84,20 +82,17 @@ class Post(models.Model):
     )
     text = models.TextField(validators=[MinLengthValidator(5)])
     tags = models.ManyToManyField(Tag, related_name="posts", blank=False)
-    # Optional: keep status if you plan to use it (currently unused in your code)
-    # status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='published', db_index=True)
-
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-id"]  # stable default for DRF lists
+        ordering = ["-id"]  
 
     def __str__(self):
         return f'Post: {self.title} by {self.author.user.username}'
 
 
-# ---- Comments -------------------------------------------------
+# ---- Comments ------
 
 class Comment(models.Model):
     post = models.ForeignKey(
@@ -124,7 +119,7 @@ class Comment(models.Model):
         return f'Comment by {self.author.user.username} on {self.post.title}'
 
 
-# ---- Likes ----------------------------------------------------
+# ---- Likes -----
 
 LIKE_CHOICES = (
     ('like', 'Like'),

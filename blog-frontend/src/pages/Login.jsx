@@ -32,7 +32,6 @@ export default function Login() {
     const username = form.username.trim();
     const password = form.password;
 
-    // quick client checks
     const fe = {};
     if (!username) fe.username = ["Username is required."];
     if (!password) fe.password = ["Password is required."];
@@ -44,11 +43,10 @@ export default function Login() {
 
     setLoading(true);
     try {
-      await login(username, password); // Option A: backed by /api/auth/login/
+      await login(username, password);
       toast.success("Welcome back!");
       nav("/");
     } catch (err) {
-      // Try to show server message if present
       const msg =
         err?.response?.data?.detail ||
         err?.response?.data?.non_field_errors?.[0] ||

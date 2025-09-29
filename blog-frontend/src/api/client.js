@@ -1,17 +1,14 @@
-// src/api/client.js
 import axios from "axios";
 
 const baseURL = (
   import.meta.env.VITE_API_URL || "http://localhost:8000"
 ).replace(/\/+$/, "");
 
-// Centralized axios instance
 const api = axios.create({
   baseURL: `${baseURL}/api`,
   withCredentials: false,
 });
 
-/* ---------------- Token helpers ---------------- */
 export function getTokens() {
   try {
     const raw = localStorage.getItem("auth");
@@ -27,9 +24,6 @@ export function clearTokens() {
   localStorage.removeItem("auth");
 }
 
-/* ---------------- Request interceptor ---------------- */
-// Attach Authorization on ALL requests when we have a token.
-// This lets the backend compute fields like `liked_by_me` on GET /posts.
 api.interceptors.request.use((config) => {
   const tokens = getTokens();
   if (tokens?.access) {
@@ -42,7 +36,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-/* ---------------- Response interceptor ---------------- */
 let refreshing = null;
 
 api.interceptors.response.use(
@@ -51,7 +44,6 @@ api.interceptors.response.use(
     const original = error?.config || {};
     const status = error?.response?.status;
 
-    // Skip refresh if not auth-related or already retried
     if (status !== 401 || !original.__auth_required || original._retry) {
       throw error;
     }
@@ -62,7 +54,6 @@ api.interceptors.response.use(
       throw error;
     }
 
-    // Avoid multiple refresh calls at once
     if (!refreshing) {
       refreshing = axios
         .post(`${baseURL}/api/token/refresh/`, { refresh: tokens.refresh })
