@@ -47,7 +47,6 @@ export default function Navbar({ toggleMode, mode }) {
 
           {user && (
             <>
-              {/* My Posts → admins only */}
               {isAdmin && (
                 <Button
                   component={NavLink}
@@ -59,7 +58,6 @@ export default function Navbar({ toggleMode, mode }) {
                 </Button>
               )}
 
-              {/* New Post → admins only */}
               {isAdmin && (
                 <Button
                   component={NavLink}
